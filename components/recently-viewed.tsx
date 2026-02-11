@@ -2,9 +2,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRecentlyViewed } from "@/stores/recently-viewed";
+import { RecentlyViewedSkeleton } from "@/components/skeletons/recently-viewed-skeleton";
 
 export function RecentlyViewed() {
+  const hasHydrated = useRecentlyViewed((state) => state.hasHydrated);
   const recentlyViewed = useRecentlyViewed((state) => state.recentlyViewed);
+
+  if (!hasHydrated) return <RecentlyViewedSkeleton />;
 
   return (
     <div className="mb-8">

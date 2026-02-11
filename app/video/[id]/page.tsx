@@ -1,6 +1,6 @@
 import { use } from "react";
 import { MOCK_VIDEOS } from "@/data/mock-videos";
-import { VideoDetails } from "@/components/video-details";
+import { VideoDetails } from "@/components/video/video-details";
 import { Video } from "@/types/video";
 import { notFound } from "next/navigation";
 

@@ -1,5 +1,5 @@
 import { RecentlyViewed } from "@/components/recently-viewed";
-import { VideoFeed } from "@/components/video-feed";
+import { VideoFeed } from "@/components/video/video-feed";
 
 export default function Home() {
   return (
