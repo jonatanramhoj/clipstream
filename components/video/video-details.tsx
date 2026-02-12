@@ -47,14 +47,22 @@ export function VideoDetails({ video: initialVideo }: { video: Video }) {
   };
 
   if (isLoading) {
-    return <span>Loading...</span>;
+    return (
+      <div className="max-w-5xl m-auto px-4 py-8 animate-pulse">
+        <div className="h-8 bg-white/10 rounded-lg w-2/3 mb-6" />
+        <div className="aspect-video bg-white/10 rounded-2xl" />
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-red-500">Failed to load videos</p>
-        <button onClick={() => mutate()} className="btn">
+        <p className="text-red-400/90 text-sm">Failed to load video</p>
+        <button
+          onClick={() => mutate()}
+          className="px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-sm font-medium hover:bg-white/10 transition-colors"
+        >
           Retry
         </button>
       </div>
@@ -62,55 +70,53 @@ export function VideoDetails({ video: initialVideo }: { video: Video }) {
   }
 
   return (
-    <div className="max-w-5xl flex flex-col m-auto px-4">
-      <div className="flex justify-between mb-4">
-        {editMode ? (
-          <>
+    <div className="max-w-5xl flex flex-col m-auto px-4 py-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex-1 min-w-0">
+          {editMode ? (
             <input
               {...register("title")}
               name="title"
               type="text"
               defaultValue={video?.title}
-              className="border border-gray-600 p-4 rounded-xl w-[500px] outline-0 focus:border-blue-600 h-[40px]"
+              className="w-full max-w-xl px-4 py-3 rounded-xl border border-white/10 bg-white/5 outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-colors text-foreground placeholder:text-gray-500"
               autoFocus
             />
-          </>
-        ) : (
-          <h2 className="text-2xl font-bold">{video?.title}</h2>
-        )}
-        <>
-          <div className="flex">
-            {editMode && (
-              <button className="btn mr-2" onClick={() => setEditMode(false)}>
-                Cancel
-              </button>
-            )}
+          ) : (
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground truncate">
+              {video?.title}
+            </h1>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {editMode && (
             <button
-              className="btn text-center w-[80px] flex items-center justify-center disabled:cursor-not-allowed bg-blue-900 hover:bg-blue-800"
-              onClick={
-                editMode ? handleSubmit(onSubmit) : () => setEditMode(!editMode)
-              }
-              disabled={isSubmiting}
+              onClick={() => setEditMode(false)}
+              className="px-4 py-3 rounded-xl border border-white/10 bg-transparent text-sm font-medium hover:bg-white/5 transition-colors cursor-pointer"
             >
-              {isSubmiting ? <Spinner /> : editMode ? "Save" : "Edit"}
+              Cancel
             </button>
-          </div>
-        </>
+          )}
+          <button
+            onClick={
+              editMode ? handleSubmit(onSubmit) : () => setEditMode(!editMode)
+            }
+            disabled={isSubmiting}
+            className="px-5 py-3 rounded-xl border border-white/10 bg-white/10 text-sm font-medium hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px] flex items-center justify-center cursor-pointer"
+          >
+            {isSubmiting ? <Spinner /> : editMode ? "Save" : "Edit"}
+          </button>
+        </div>
       </div>
-      <div className="mb-6">
+
+      <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/20">
         <VideoPlayer
           options={{
             autoplay: false,
             controls: true,
-            sources: [
-              {
-                src: video?.hlsUrl,
-              },
-            ],
+            sources: [{ src: video?.hlsUrl }],
           }}
-          onTimeUpdate={(currentTime) => {
-            console.log("currentTime", currentTime);
-          }}
+          onTimeUpdate={() => {}}
         />
       </div>
     </div>
