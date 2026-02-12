@@ -1,5 +1,3 @@
-// data/mock-videos.ts
-
 export const MOCK_VIDEOS = [
   {
     id: "1",
@@ -66,15 +64,3 @@ export const MOCK_VIDEOS = [
     createdAt: "2024-02-02T12:00:00Z",
   },
 ];
-
-export const CATEGORIES = [
-  "all",
-  "basketball",
-  "soccer",
-  "football",
-  "tennis",
-  "hockey",
-  "baseball",
-] as const;
-
-export type Category = (typeof CATEGORIES)[number];

@@ -6,14 +6,7 @@ import useSWR from "swr";
 import { VideoFeedSkeleton } from "@/components/skeletons/video-feed-skeleton";
 
 export function VideoFeed() {
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data, isLoading, error, mutate } = useSWR<Video[]>(
-    "/api/videos",
-    fetcher,
-    { revalidateOnFocus: false },
-  );
-
-  console.log("data", data);
+  const { data, isLoading, error, mutate } = useSWR<Video[]>("/api/videos");
 
   if (isLoading) {
     return <VideoFeedSkeleton />;
