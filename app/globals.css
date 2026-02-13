@@ -23,7 +23,11 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  margin-top: 100px;
+  margin-top: 120px;
+}
+
+button {
+  cursor: pointer;
 }
 
 .vjs-big-play-centered {
@@ -34,6 +38,18 @@ body {
 @layer components {
   .btn {
     @apply text-white bg-gray-800 hover:bg-gray-700 py-2 px-4 rounded cursor-pointer transition-all ease-in-out duration-150;
+  }
+
+  .btn-submit {
+    @apply px-5 py-3 rounded-xl border border-white/10 bg-white/10 text-sm font-medium hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px] flex items-center justify-center cursor-pointer;
+  }
+
+  .btn-cancel {
+    @apply px-4 py-3 rounded-xl border border-white/10 bg-transparent text-sm font-medium hover:bg-white/5 transition-colors cursor-pointer;
+  }
+
+  .input {
+    @apply w-full max-w-xl px-4 py-3 rounded-xl border border-white/10 bg-white/5 outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-colors text-foreground placeholder:text-gray-500 h-[46px];
   }
 
   .card {

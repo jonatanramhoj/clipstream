@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ClipStream",
-  description: "Video streaming platform",
+  title: "CLV",
+  description: "Clip Vault",
 };
 
 export default function RootLayout({

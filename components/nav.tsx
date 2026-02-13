@@ -10,7 +10,7 @@ export function Nav() {
   const isDetailsPage = pathname?.includes("video");
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 p-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 py-8">
       <div className="max-w-5xl flex flex-row items-center justify-between m-auto px-4">
         {isDetailsPage ? (
           <button
@@ -29,7 +29,7 @@ export function Nav() {
           </Link>
         )}
         {!isDetailsPage && (
-          <ul className="flex gap-6 px-6 py-3 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl">
+          <ul className="gap-6 px-6 py-3 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl hidden sm:flex">
             {navItems.map((item) => (
               <li key={item}>
                 <span className="text-gray-200 cursor-pointer text-sm font-medium opacity-90 hover:opacity-100 transition-opacity">

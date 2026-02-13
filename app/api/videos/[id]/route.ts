@@ -13,12 +13,14 @@ export async function GET(
 }
 
 export async function PATCH(req: NextRequest) {
-  const { id, ...updates } = await req.json();
+  const { id, title } = await req.json();
+
+  const serverTitle = `${title} (Verified)`;
 
   const index = MOCK_VIDEOS.findIndex((v) => v.id === id);
-  MOCK_VIDEOS[index] = { ...MOCK_VIDEOS[index], ...updates };
+  MOCK_VIDEOS[index] = { ...MOCK_VIDEOS[index], title: serverTitle };
 
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  return NextResponse.json(MOCK_VIDEOS);
+  return NextResponse.json(MOCK_VIDEOS[index]);
 }

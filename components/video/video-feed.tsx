@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
 import { VideoFeedSkeleton } from "@/components/skeletons/video-feed-skeleton";
+import { VideoLoadError } from "./video-load-error";
 
 export function VideoFeed() {
   const { data, isLoading, error, mutate } = useSWR<Video[]>("/api/videos");
@@ -13,19 +14,12 @@ export function VideoFeed() {
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-red-500">Failed to load videos</p>
-        <button onClick={() => mutate()} className="btn">
-          Retry
-        </button>
-      </div>
-    );
+    return <VideoLoadError onRetry={mutate} />;
   }
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Video feed</h2>
+      <h2 className="text-xl font-bold mb-4 text-gray-400">Video feed</h2>
       <ul className="grid grid-cols-3 gap-6">
         {data?.map((video) => (
           <li key={video.id}>
@@ -40,7 +34,7 @@ export function VideoFeed() {
                   unoptimized
                 />
                 <div className="absolute inset-x-0 bottom-0 py-3 px-4 bg-linear-to-t from-black/80 to-transparent backdrop-blur-sm">
-                  <span className="text-sm font-medium text-white/95 line-clamp-2">
+                  <span className="text-xl font-bold text-white/95 line-clamp-2">
                     {video.title}
                   </span>
                 </div>
