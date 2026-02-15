@@ -1,7 +1,5 @@
 import { use } from "react";
-import { MOCK_VIDEOS } from "@/data/mock-videos";
 import { VideoDetails } from "@/components/video/video-details";
-import { Video } from "@/types/video";
 import { notFound } from "next/navigation";
 
 export default function VideoDetailsPage({
@@ -10,13 +8,12 @@ export default function VideoDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const video: Video | undefined = MOCK_VIDEOS.find((video) => video.id === id);
 
-  if (!video) notFound();
+  if (!id) notFound();
 
   return (
     <main>
-      <VideoDetails video={video} />
+      <VideoDetails videoId={id} />
     </main>
   );
 }

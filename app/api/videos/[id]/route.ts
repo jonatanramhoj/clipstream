@@ -15,6 +15,10 @@ export async function GET(
 export async function PATCH(req: NextRequest) {
   const { id, title } = await req.json();
 
+  if (title.toLowerCase() === "error") {
+    return NextResponse.json({ message: "DB Error" }, { status: 500 });
+  }
+
   const serverTitle = `${title} (Verified)`;
 
   const index = MOCK_VIDEOS.findIndex((v) => v.id === id);

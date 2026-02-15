@@ -5,31 +5,41 @@ import { useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { VideoDetailsSkeleton } from "../skeletons/video-details-skeleton";
 import { VideoLoadError } from "./video-load-error";
+import { VideoNotFound } from "./video-not-found";
 
-export function VideoDetails({ video: initialVideo }: { video: Video }) {
-  const [editMode, setEditMode] = useState(false);
+export function VideoDetails({ videoId }: { videoId: string }) {
+  const [isEditing, setIsEditing] = useState(false);
 
   const {
     data: video,
     mutate,
     error,
     isLoading,
-  } = useSWR<Video>(`/api/videos/${initialVideo.id}`);
+  } = useSWR<Video>(`/api/videos/${videoId}`);
 
   const { mutate: globalMutate } = useSWRConfig();
 
   async function handleSubmit(formData: FormData) {
     const newTitle = formData.get("title") as string;
 
-    mutate(
-      fetch(`/api/videos/${video!.id}`, {
+    const updateFn = async () => {
+      const res = await fetch(`/api/videos/${videoId}`, {
         method: "PATCH",
         body: JSON.stringify({ ...video, title: newTitle }),
-      }).then((res) => res.json()),
-      { optimisticData: { ...video!, title: newTitle } },
-    );
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      return res.json();
+    };
 
-    setEditMode(false);
+    const options = {
+      optimisticData: { ...video!, title: newTitle },
+      rollbackOnError: true,
+      throwOnError: false,
+    };
+
+    mutate(updateFn, options);
+
+    setIsEditing(false);
     globalMutate("/api/videos");
   }
 
@@ -41,14 +51,18 @@ export function VideoDetails({ video: initialVideo }: { video: Video }) {
     return <VideoLoadError onRetry={mutate} />;
   }
 
+  if (!video) {
+    return <VideoNotFound />;
+  }
+
   return (
     <div className="max-w-5xl flex flex-col m-auto px-4 py-8">
       <form
-        action={editMode ? handleSubmit : () => setEditMode(!editMode)}
+        action={isEditing ? handleSubmit : () => setIsEditing(!isEditing)}
         className="flex flex-wrap items-center justify-between gap-4 mb-6"
       >
         <div className="flex-1 min-w-0">
-          {editMode ? (
+          {isEditing ? (
             <input
               name="title"
               type="text"
@@ -63,12 +77,12 @@ export function VideoDetails({ video: initialVideo }: { video: Video }) {
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {editMode && (
-            <button onClick={() => setEditMode(false)} className="btn-cancel">
+          {isEditing && (
+            <button onClick={() => setIsEditing(false)} className="btn-cancel">
               Cancel
             </button>
           )}
-          <button className="btn-submit">{editMode ? "Save" : "Edit"}</button>
+          <button className="btn-submit">{isEditing ? "Save" : "Edit"}</button>
         </div>
       </form>
 
