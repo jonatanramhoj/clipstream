@@ -1,23 +1,39 @@
 import { useRef, useState } from "react";
 import Moment from "react-moment";
-import useSWR from "swr";
 import { CommentsSkeleton } from "../skeletons/comments-skeleton";
 import { Comment } from "@/types/comment";
+import useSWRInfinite, { SWRInfiniteMutatorOptions } from "swr/infinite";
+import { Spinner } from "../spinner";
+
+type CommentPage = {
+  comments: Comment[];
+  nextCursor: number | null;
+};
 
 export function Comments({ videoId }: { videoId: string }) {
   const [isFocused, setIsFocused] = useState(false);
   const buttonWrapperRef = useRef<HTMLDivElement>(null);
+  const mockUser = { name: "John Doe" };
 
-  const mockUser = {
-    name: "John Doe",
+  const getKey = (pageIndex: number, previousPageData: CommentPage | null) => {
+    const defaultLimit = 5;
+
+    // 1. If we reached the end (API returned no nextCursor), stop fetching
+    if (previousPageData && !previousPageData.nextCursor) return null;
+
+    // 2. First page (index 0), fetch without a cursor
+    if (pageIndex === 0)
+      return `/api/videos/${videoId}/comments?limit=${defaultLimit}`;
+
+    // 3. Subsequent pages: use the cursor from the previous response
+    return `/api/videos/${videoId}/comments?cursor=${previousPageData?.nextCursor}&limit=${defaultLimit}`;
   };
 
-  const {
-    data: comments,
-    isLoading,
-    error,
-    mutate,
-  } = useSWR<Comment[]>(`/api/videos/${videoId}/comments`);
+  const { data, isLoading, isValidating, error, mutate, size, setSize } =
+    useSWRInfinite<CommentPage | null>(getKey, { revalidateOnFocus: false });
+
+  const comments = data?.flatMap((page) => page?.comments ?? []) ?? [];
+  const nextCursor = data?.at(-1)?.nextCursor;
 
   function handleSubmit(formData: FormData) {
     const newCommentText = formData.get("newComment");
@@ -41,10 +57,27 @@ export function Comments({ videoId }: { videoId: string }) {
       return res.json();
     };
 
-    const options = {
-      optimisticData: [...(comments ?? []), newComment],
+    const options: SWRInfiniteMutatorOptions<(CommentPage | null)[]> = {
+      optimisticData: (allPages) => {
+        // If no pages (comments) exist yet, create the first one manually
+        if (!allPages || !allPages[0]) {
+          return [{ comments: [newComment], nextCursor: null }];
+        }
+
+        const [firstPage, ...olderPages] = allPages;
+
+        // copy the first page and prepend the new comment
+        const updatedFirstPage = {
+          ...firstPage,
+          comments: [newComment, ...firstPage.comments],
+        };
+
+        // return the all pages array with the updated first page
+        return [updatedFirstPage, ...olderPages];
+      },
       rollbackOnError: true,
       throwOnError: false,
+      revalidate: false,
     };
 
     mutate(updateFn, options);
@@ -102,6 +135,19 @@ export function Comments({ videoId }: { videoId: string }) {
             </li>
           ))}
         </ul>
+        <button
+          className="btn disabled:cursor-not-allowed! disabled:bg-gray-700 flex items-center justify-center"
+          onClick={() => setSize(size + 1)}
+          disabled={isValidating || !nextCursor}
+        >
+          {isValidating ? (
+            <Spinner />
+          ) : nextCursor ? (
+            "Load More"
+          ) : (
+            "No more comments"
+          )}
+        </button>
       </div>
     </>
   );
