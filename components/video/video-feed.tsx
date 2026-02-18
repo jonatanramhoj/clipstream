@@ -1,13 +1,18 @@
 "use client";
-import { Video } from "@/types/video";
 import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
-import { VideoFeedSkeleton } from "@/components/skeletons/video-feed-skeleton";
+import { Video } from "@/types/video";
+import { VideoFeedSkeleton } from "../skeletons/video-feed-skeleton";
 import { VideoLoadError } from "./video-load-error";
 
 export function VideoFeed() {
-  const { data, isLoading, error, mutate } = useSWR<Video[]>("/api/videos");
+  const {
+    data: videoFeed,
+    isLoading,
+    error,
+    mutate,
+  } = useSWR<Video[]>("/api/videos");
 
   if (isLoading) {
     return <VideoFeedSkeleton />;
@@ -21,7 +26,7 @@ export function VideoFeed() {
     <div>
       <h2 className="text-xl font-bold mb-4 text-gray-400">Video feed</h2>
       <ul className="grid grid-cols-3 gap-6">
-        {data?.map((video) => (
+        {videoFeed?.map((video) => (
           <li key={video.id}>
             <Link href={`/video/${video.id}`} className="group card">
               <div className="relative overflow-hidden">

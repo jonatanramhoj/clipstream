@@ -1,58 +1,47 @@
 "use client";
-import { Video } from "@/types/video";
 import { VideoPlayer } from "./video-player";
 import { useState } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { VideoDetailsSkeleton } from "../skeletons/video-details-skeleton";
 import { VideoLoadError } from "./video-load-error";
-import { VideoNotFound } from "./video-not-found";
+import { Comments } from "../comments/comments";
 
 export function VideoDetails({ videoId }: { videoId: string }) {
-  const [isEditing, setIsEditing] = useState(false);
-
   const {
     data: video,
-    mutate,
-    error,
     isLoading,
-  } = useSWR<Video>(`/api/videos/${videoId}`);
+    error,
+    mutate,
+  } = useSWR(`/api/videos/${videoId}`);
 
-  const { mutate: globalMutate } = useSWRConfig();
+  const [isEditing, setIsEditing] = useState(false);
 
-  async function handleSubmit(formData: FormData) {
-    const newTitle = formData.get("title") as string;
+  if (isLoading) return <VideoDetailsSkeleton />;
+
+  if (error) return <VideoLoadError onRetry={mutate} />;
+
+  function handleSubmit(formData: FormData) {
+    const newTitle = formData.get("title");
 
     const updateFn = async () => {
       const res = await fetch(`/api/videos/${videoId}`, {
         method: "PATCH",
         body: JSON.stringify({ ...video, title: newTitle }),
       });
+
       if (!res.ok) throw new Error("Failed to update");
+
       return res.json();
     };
 
     const options = {
-      optimisticData: { ...video!, title: newTitle },
+      optimisticData: { ...video, title: newTitle },
       rollbackOnError: true,
       throwOnError: false,
     };
 
     mutate(updateFn, options);
-
     setIsEditing(false);
-    globalMutate("/api/videos");
-  }
-
-  if (isLoading) {
-    return <VideoDetailsSkeleton />;
-  }
-
-  if (error) {
-    return <VideoLoadError onRetry={mutate} />;
-  }
-
-  if (!video) {
-    return <VideoNotFound />;
   }
 
   return (
@@ -86,7 +75,7 @@ export function VideoDetails({ videoId }: { videoId: string }) {
         </div>
       </form>
 
-      <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+      <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/20 mb-8">
         <VideoPlayer
           options={{
             autoplay: false,
@@ -96,6 +85,7 @@ export function VideoDetails({ videoId }: { videoId: string }) {
           onTimeUpdate={() => {}}
         />
       </div>
+      <Comments videoId={videoId} />
     </div>
   );
 }
