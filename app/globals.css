@@ -48,6 +48,10 @@ button {
     @apply px-4 py-3 rounded-xl border border-white/10 bg-transparent text-sm font-medium hover:bg-white/5 transition-colors cursor-pointer;
   }
 
+  .btn-load-more {
+    @apply disabled:cursor-not-allowed! disabled:bg-gray-700 flex items-center justify-center max-w-[200px] min-w-[200px] h-[40px] self-center;
+  }
+
   .input {
     @apply w-full max-w-xl px-4 py-3 rounded-xl border border-white/10 bg-white/5 outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-colors text-foreground placeholder:text-gray-500 h-[46px];
   }

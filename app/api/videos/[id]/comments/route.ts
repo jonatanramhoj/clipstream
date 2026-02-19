@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const cursor = Number(searchParams.get("cursor") ?? 0); // a starting point number representing from where to fetch the next set of pages
-  const limit = Number(searchParams.get("limit") ?? 5); // limit how many items to fetch everytime
+  const cursor = Number(searchParams.get("cursor") ?? 0);
+  const limit = Number(searchParams.get("limit") ?? 5);
 
   const page = MOCK_COMMENTS.slice(cursor, cursor + limit);
 

@@ -5,3 +5,8 @@ export type Comment = {
   text: string;
   createdAt?: string;
 };
+
+export type CommentPage = {
+  comments: Comment[];
+  nextCursor: number | null;
+};
